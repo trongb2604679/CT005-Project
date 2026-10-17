@@ -13,6 +13,7 @@ function switchGame(gameType) {
   if (activeNavBtn) activeNavBtn.classList.add('active');
 
   stopCakeGame();
+  stopFlappy();
   clearMemoryTimeouts();
 
   const memoryWrapper = document.getElementById('memoryWrapper');
@@ -31,13 +32,21 @@ function switchGame(gameType) {
     canvasWrapper.style.display = 'block';
     themeSelector.style.display = 'none';
     setupCakeReadyState();
+  } else if (gameType === 'flappy') {
+    document.getElementById('gameTitle').textContent = "🐤 Flappy Bird";
+    memoryWrapper.style.display = 'none';
+    canvasWrapper.style.display = 'block';
+    themeSelector.style.display = 'none';
+    setupFlappyReadyState();
   }
 }
 
 function pressStartButton() {
   document.getElementById('startOverlay').style.display = 'none';
   isGameRunning = true;
+
   if (currentGame === 'cake') startCakeGame();
+  else if (currentGame === 'flappy') startFlappyGame();
 }
 
 // ==========================================
@@ -427,6 +436,184 @@ function drawCakeLayer(ctx, x, y, width, color) {
 function stopCakeGame() {
   if (cakeLoop) clearInterval(cakeLoop);
 }
+
+// ==========================================
+// GAME 3: FLAPPY BIRD
+// ==========================================
+let flappyLoop = null, birdY, birdVelocity, pipes, flappyScore = 0;
+let cloudX = 0;
+
+function setupFlappyReadyState() {
+  document.getElementById('dashboard').innerHTML = `
+    <span>Điểm: <span id="flappyScore">0</span></span>
+    <span>Thao tác: Click / Space</span>
+  `;
+  document.getElementById('previewMessage').textContent = "Nhấn 'BẮT ĐẦU CHƠI' để cất cánh!";
+  document.getElementById('startOverlay').style.display = 'flex';
+  document.getElementById('overlayTitle').textContent = "🐤 FLAPPY BIRD";
+
+  const canvas = document.getElementById('mainCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = 400; 
+  canvas.height = 400;
+
+  birdY = 180; 
+  birdVelocity = 0; 
+  pipes = []; 
+  flappyScore = 0;
+  renderFlappy2D(ctx);
+}
+
+function startFlappyGame() {
+  document.getElementById('previewMessage').textContent = "Nhấn Space hoặc Click để giữ chim bay!";
+
+  const canvas = document.getElementById('mainCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const jump = (e) => { 
+    if (currentGame === 'flappy' && isGameRunning) {
+      if (e && e.type === 'keydown' && e.code !== 'Space') return;
+      birdVelocity = -6.2; 
+    }
+  };
+
+  window.onkeydown = jump;
+  canvas.onclick = jump;
+
+  stopFlappy();
+  flappyLoop = setInterval(() => updateFlappy(ctx), 1000 / 60);
+}
+
+function updateFlappy(ctx) {
+  birdVelocity += 0.35;
+  birdY += birdVelocity;
+
+  cloudX -= 0.5;
+  if (cloudX <= -400) cloudX = 0;
+
+  if (pipes.length === 0 || pipes[pipes.length - 1].x < 220) {
+    let gap = 115;
+    let topHeight = Math.floor(Math.random() * (190 - 50)) + 50;
+    pipes.push({ x: 400, top: topHeight, bottom: topHeight + gap, passed: false });
+  }
+
+  pipes.forEach(p => p.x -= 2.2);
+  if (pipes.length > 0 && pipes[0].x < -60) pipes.shift();
+
+  pipes.forEach(p => {
+    if (!p.passed && p.x < 70) {
+      p.passed = true;
+      flappyScore += 1;
+      document.getElementById('flappyScore').textContent = flappyScore;
+    }
+  });
+
+  if (birdY > 370 || birdY < 0 || pipes.some(p => p.x < 95 && p.x > 45 && (birdY < p.top || birdY > p.bottom))) {
+    stopFlappy();
+    isGameRunning = false;
+    alert(`💥 GAME OVER!\nChim đã rơi hoặc va chạm!\nĐiểm đạt được: ${flappyScore}`);
+    return;
+  }
+
+  renderFlappy2D(ctx);
+}
+
+function renderFlappy2D(ctx) {
+  let skyGrad = ctx.createLinearGradient(0, 0, 0, 400);
+  skyGrad.addColorStop(0, '#0369a1');
+  skyGrad.addColorStop(0.6, '#38bdf8');
+  skyGrad.addColorStop(1, '#bae6fd');
+  ctx.fillStyle = skyGrad;
+  ctx.fillRect(0, 0, 400, 400);
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+  for (let offset of [cloudX, cloudX + 400]) {
+    ctx.beginPath();
+    ctx.arc(offset + 80, 100, 25, 0, Math.PI * 2);
+    ctx.arc(offset + 110, 90, 35, 0, Math.PI * 2);
+    ctx.arc(offset + 140, 100, 25, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = '#0284c7';
+  ctx.beginPath();
+  ctx.moveTo(0, 385);
+  ctx.lineTo(80, 300); 
+  ctx.lineTo(180, 385);
+  ctx.lineTo(260, 280); 
+  ctx.lineTo(360, 385);
+  ctx.fill();
+
+  pipes.forEach(p => {
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 4;
+
+    let pipeGrad = ctx.createLinearGradient(p.x, 0, p.x + 50, 0);
+    pipeGrad.addColorStop(0, '#15803d');
+    pipeGrad.addColorStop(0.3, '#4ade80');
+    pipeGrad.addColorStop(0.8, '#22c55e');
+    pipeGrad.addColorStop(1, '#14532d');
+
+    ctx.fillStyle = pipeGrad;
+    ctx.fillRect(p.x, 0, 50, p.top);
+    ctx.fillRect(p.x - 4, p.top - 20, 58, 20);
+
+    ctx.fillRect(p.x, p.bottom, 50, 400 - p.bottom);
+    ctx.fillRect(p.x - 4, p.bottom, 58, 20);
+    ctx.restore();
+  });
+
+  ctx.fillStyle = '#16a34a';
+  ctx.fillRect(0, 380, 400, 20);
+
+  ctx.save();
+  ctx.translate(75, birdY);
+  let angle = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, birdVelocity * 0.08));
+  ctx.rotate(angle);
+
+  ctx.shadowColor = 'rgba(0,0,0,0.4)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 4;
+
+  let birdGrad = ctx.createRadialGradient(-3, -3, 2, 0, 0, 14);
+  birdGrad.addColorStop(0, '#fef08a');
+  birdGrad.addColorStop(0.7, '#eab308');
+  birdGrad.addColorStop(1, '#ca8a04');
+
+  ctx.fillStyle = birdGrad;
+  ctx.beginPath(); 
+  ctx.arc(0, 0, 13, 0, Math.PI * 2); 
+  ctx.fill();
+
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); 
+  ctx.arc(5, -4, 4.5, 0, Math.PI * 2); 
+  ctx.fill();
+
+  ctx.fillStyle = '#0f172a';
+  ctx.beginPath(); 
+  ctx.arc(6, -4, 2, 0, Math.PI * 2); 
+  ctx.fill();
+
+  ctx.fillStyle = '#f97316';
+  ctx.beginPath();
+  ctx.moveTo(8, 0); 
+  ctx.lineTo(17, 3); 
+  ctx.lineTo(8, 7);
+  ctx.fill();
+
+  ctx.fillStyle = '#facc15';
+  ctx.beginPath(); 
+  ctx.ellipse(-5, 2, 7, 4.5, Math.PI / 4, 0, Math.PI * 2); 
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function stopFlappy() { if (flappyLoop) clearInterval(flappyLoop); }
 
 // Khởi chạy khi load trang
 window.addEventListener('DOMContentLoaded', () => {
