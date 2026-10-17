@@ -28,7 +28,7 @@
     <button class="theme-btn" onclick="changeMemoryTheme(3)">⚽ Thể thao</button>
   </div>
 
-  <!-- Dashboard trạng thái & Thông báo preview -->
+  <!-- Dashboard trạng thái & Thông báo -->
   <div class="status-dashboard" id="dashboard"></div>
   <div id="previewMessage" class="preview-msg"></div>
 
@@ -41,6 +41,15 @@
         <button class="start-btn" onclick="startMemoryGameFromOverlay()">BẮT ĐẦU CHƠI 🚀</button>
       </div>
       <div class="memory-board" id="memoryBoard"></div>
+    </div>
+    
+    <!-- Game 2 & 3: Khung chứa Canvas -->
+    <div class="canvas-wrapper" id="canvasWrapper">
+      <div class="start-overlay" id="startOverlay">
+        <h3 id="overlayTitle">Sẵn Sàng Bắt Đầu?</h3>
+        <button class="start-btn" onclick="pressStartButton()">BẮT ĐẦU CHƠI 🚀</button>
+      </div>
+      <canvas id="mainCanvas" class="game-canvas" width="400" height="400"></canvas>
     </div>
   </div>
 

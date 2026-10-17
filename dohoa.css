@@ -189,6 +189,20 @@ body {
   border: 2px solid #60a5fa;
 }
 
+.canvas-wrapper {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: none;
+}
+
+canvas.game-canvas {
+  background-color: #020617;
+  border: 3px solid #1e293b;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+}
+
 .start-overlay {
   position: absolute;
   top: 0;
@@ -233,5 +247,13 @@ body {
 @media (max-width: 500px) {
   .memory-board {
     grid-template-columns: repeat(4, 1fr);
+  }
+  .canvas-wrapper {
+    width: 340px;
+    height: 340px;
+  }
+  canvas.game-canvas {
+    width: 340px;
+    height: 340px;
   }
 }
