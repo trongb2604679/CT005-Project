@@ -8,6 +8,18 @@
 </head>
 <body>
 
+  <!-- Canvas Pháo hoa (Fixed Overlay) -->
+  <canvas id="fxCanvas"></canvas>
+
+  <!-- Modal Bảng Kết Thúc -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-card">
+      <h3 class="modal-title" id="modalTitle">🎉 CHIẾN THẮNG!</h3>
+      <div class="modal-body" id="modalBody">Thống kê...</div>
+      <button class="start-btn" onclick="closeModalAndRestart()">Chơi tiếp 🔄</button>
+    </div>
+  </div>
+
   <!-- Thanh chọn game (SPA Navigation) -->
   <div class="game-selector">
     <button class="nav-btn active" data-game="memory" onclick="switchGame('memory')">🎴 Lật Thẻ Bài</button>
@@ -43,7 +55,7 @@
       <div class="memory-board" id="memoryBoard"></div>
     </div>
     
-    <!-- Game 2 & 3: Khung chứa Canvas chung -->
+    <!-- Game 2 & 3: Canvas chung -->
     <div class="canvas-wrapper" id="canvasWrapper">
       <div class="start-overlay" id="startOverlay">
         <h3 id="overlayTitle">Sẵn Sàng Bắt Đầu?</h3>

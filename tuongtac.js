@@ -1,10 +1,213 @@
 // ==========================================
-// HỆ THỐNG ĐIỀU HƯỚNG SPA
+// AUDIO SYNTHESIZER (WEB AUDIO API)
+// ==========================================
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playSound(type, level = 0) {
+  initAudio();
+  if (!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+
+  if (type === 'drop') {
+    // Tiếng "Thộp" nảy xốp khi đặt bánh kem
+    const oscBody = audioCtx.createOscillator();
+    const gainBody = audioCtx.createGain();
+    
+    oscBody.type = 'sine';
+    let startFreq = 280 + (level * 12);
+    oscBody.frequency.setValueAtTime(startFreq, now);
+    oscBody.frequency.exponentialRampToValueAtTime(80, now + 0.12);
+
+    gainBody.gain.setValueAtTime(1.0, now);
+    gainBody.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+    oscBody.connect(gainBody);
+    gainBody.connect(audioCtx.destination);
+    oscBody.start(now);
+    oscBody.stop(now + 0.18);
+
+    const oscSquish = audioCtx.createOscillator();
+    const gainSquish = audioCtx.createGain();
+    
+    oscSquish.type = 'triangle';
+    oscSquish.frequency.setValueAtTime(160, now);
+    oscSquish.frequency.linearRampToValueAtTime(240, now + 0.1);
+
+    gainSquish.gain.setValueAtTime(0.6, now);
+    gainSquish.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+    oscSquish.connect(gainSquish);
+    gainSquish.connect(audioCtx.destination);
+    oscSquish.start(now);
+    oscSquish.stop(now + 0.14);
+
+  } else if (type === 'flip') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+    osc.start(now); 
+    osc.stop(now + 0.08);
+  } else if (type === 'match') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.1);
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+    osc.start(now); 
+    osc.stop(now + 0.25);
+  } else if (type === 'cut') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+    gain.gain.setValueAtTime(0.35, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+    osc.start(now); 
+    osc.stop(now + 0.08);
+  } else if (type === 'flap') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(450, now);
+    osc.frequency.exponentialRampToValueAtTime(180, now + 0.09);
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.09);
+    osc.start(now); 
+    osc.stop(now + 0.09);
+  } else if (type === 'point') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(987.77, now);
+    osc.frequency.setValueAtTime(1318.51, now + 0.08);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+    osc.start(now); 
+    osc.stop(now + 0.2);
+  } else if (type === 'hit') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
+    gain.gain.setValueAtTime(0.5, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+    osc.start(now); 
+    osc.stop(now + 0.25);
+  } else if (type === 'win') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.setValueAtTime(400, now);
+    osc.frequency.setValueAtTime(600, now + 0.15);
+    osc.frequency.setValueAtTime(800, now + 0.3);
+    gain.gain.setValueAtTime(0.4, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
+    osc.start(now); 
+    osc.stop(now + 0.5);
+  }
+}
+
+// ==========================================
+// SYSTEM & MODAL & HIỆU ỨNG PHÁO HOA
 // ==========================================
 let currentGame = 'memory';
 let isGameRunning = false;
+const fxCanvas = document.getElementById('fxCanvas');
+const fxCtx = fxCanvas.getContext('2d');
+let particles = [];
+
+function resizeFx() {
+  fxCanvas.width = window.innerWidth;
+  fxCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeFx);
+resizeFx();
+
+function triggerWinEffect() {
+  playSound('win');
+  particles = [];
+  const colors = ['#38bdf8', '#facc15', '#4ade80', '#f43f5e', '#a855f7'];
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      vx: (Math.random() - 0.5) * 14,
+      vy: (Math.random() - 0.5) * 14,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: Math.random() * 6 + 4,
+      alpha: 1
+    });
+  }
+  animateFx();
+}
+
+function animateFx() {
+  fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+  particles.forEach((p, index) => {
+    p.x += p.vx; 
+    p.y += p.vy; 
+    p.alpha -= 0.015;
+    fxCtx.globalAlpha = Math.max(0, p.alpha);
+    fxCtx.fillStyle = p.color;
+    fxCtx.beginPath();
+    fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    fxCtx.fill();
+    if (p.alpha <= 0) particles.splice(index, 1);
+  });
+  if (particles.length > 0) requestAnimationFrame(animateFx);
+}
+
+function showModal(isWin, title, htmlContent) {
+  const modal = document.getElementById('modalOverlay');
+  const titleElem = document.getElementById('modalTitle');
+  const bodyElem = document.getElementById('modalBody');
+
+  titleElem.textContent = title;
+  titleElem.style.color = isWin ? '#38bdf8' : '#f43f5e';
+  bodyElem.innerHTML = htmlContent;
+
+  modal.classList.add('active');
+  if (isWin) triggerWinEffect();
+  else playSound('hit');
+}
+
+function closeModalAndRestart() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  switchGame(currentGame);
+}
 
 function switchGame(gameType) {
+  initAudio();
   currentGame = gameType;
   isGameRunning = false;
 
@@ -41,7 +244,10 @@ function switchGame(gameType) {
   }
 }
 
+function restartCurrentGame() { switchGame(currentGame); }
+
 function pressStartButton() {
+  initAudio();
   document.getElementById('startOverlay').style.display = 'none';
   isGameRunning = true;
 
@@ -104,6 +310,7 @@ function setupMemoryReadyState() {
 }
 
 function startMemoryGameFromOverlay() {
+  initAudio();
   clearMemoryTimeouts();
   document.getElementById('memoryOverlay').style.display = 'none';
   isGameRunning = true;
@@ -123,6 +330,7 @@ function startMemoryGameFromOverlay() {
   cards.forEach((card, index) => {
     let t = setTimeout(() => {
       card.classList.add('flip');
+      playSound('flip');
 
       if (index === cards.length - 1) {
         let t2 = setTimeout(() => {
@@ -162,6 +370,7 @@ function startMemoryCountdown() {
 
 function flipCard() {
   if (memLock || !isGameRunning || this === firstCard) return;
+  playSound('flip');
   this.classList.add('flip');
 
   if (!firstCard) { 
@@ -173,6 +382,7 @@ function flipCard() {
   document.getElementById('memMoves').textContent = memMoves;
 
   if (firstCard.dataset.icon === secondCard.dataset.icon) {
+    playSound('match');
     let c1 = firstCard, c2 = secondCard;
     let t = setTimeout(() => { 
       c1.classList.add('matched'); 
@@ -184,7 +394,10 @@ function flipCard() {
     [firstCard, secondCard] = [null, null];
     if (memMatched === themes[themeIdx].length) {
       clearInterval(memoryTimer);
-      alert(`🎉 CHIẾN THẮNG!\nThời gian: ${document.getElementById('memTime').textContent}\nLượt lật: ${memMoves}`);
+      showModal(true, "🎉 CHIẾN THẮNG!", `
+        <b>Thời gian hoàn thành:</b> ${document.getElementById('memTime').textContent}<br>
+        <b>Tổng số lượt lật:</b> ${memMoves} lượt
+      `);
     }
   } else {
     memLock = true;
@@ -304,7 +517,7 @@ function dropCakeBlock() {
     currentBlock = null;
     stopCakeGame();
     isGameRunning = false;
-    alert(`💥 GAME OVER!\nBạn đã thả hụt bánh kem!\nĐộ cao tòa nhà: ${cakeScore} tầng`);
+    showModal(false, "💥 GAME OVER", `Bạn đã thả hụt bánh kem!<br><b>Độ cao tòa nhà:</b> ${cakeScore} tầng`);
     return;
   }
 
@@ -315,6 +528,7 @@ function dropCakeBlock() {
   let pieceX = deltaX > 0 ? newX + newWidth : currentBlock.x;
 
   if (pieceWidth > 0) {
+    playSound('cut');
     fallingPieces.push({
       x: pieceX,
       y: currentBlock.y,
@@ -322,6 +536,8 @@ function dropCakeBlock() {
       vy: 2,
       color: currentBlock.color
     });
+  } else {
+    playSound('drop', cakeScore);
   }
 
   stack.push({
@@ -474,6 +690,7 @@ function startFlappyGame() {
     if (currentGame === 'flappy' && isGameRunning) {
       if (e && e.type === 'keydown' && e.code !== 'Space') return;
       birdVelocity = -6.2; 
+      playSound('flap');
     }
   };
 
@@ -505,13 +722,14 @@ function updateFlappy(ctx) {
       p.passed = true;
       flappyScore += 1;
       document.getElementById('flappyScore').textContent = flappyScore;
+      playSound('point');
     }
   });
 
   if (birdY > 370 || birdY < 0 || pipes.some(p => p.x < 95 && p.x > 45 && (birdY < p.top || birdY > p.bottom))) {
     stopFlappy();
     isGameRunning = false;
-    alert(`💥 GAME OVER!\nChim đã rơi hoặc va chạm!\nĐiểm đạt được: ${flappyScore}`);
+    showModal(false, "💥 GAME OVER", `Chim đã rơi hoặc va chạm!<br><b>Điểm đạt được:</b> ${flappyScore}`);
     return;
   }
 
@@ -615,7 +833,7 @@ function renderFlappy2D(ctx) {
 
 function stopFlappy() { if (flappyLoop) clearInterval(flappyLoop); }
 
-// Khởi chạy khi load trang
+// Khởi chạy mặc định khi load xong DOM
 window.addEventListener('DOMContentLoaded', () => {
   switchGame('memory');
 });
