@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Game Collection</title>
+  <link rel="stylesheet" href="dohoa.css">
+</head>
+<body>
+
+  <!-- Thanh chọn game (SPA Navigation) -->
+  <div class="game-selector">
+    <button class="nav-btn active" data-game="memory" onclick="switchGame('memory')">🎴 Lật Thẻ Bài</button>
+    <button class="nav-btn" data-game="cake" onclick="switchGame('cake')">🎂 Xếp Bánh Kem</button>
+    <button class="nav-btn" data-game="flappy" onclick="switchGame('flappy')">🐤 Flappy Bird</button>
+  </div>
+
+  <!-- Thanh tiêu đề -->
+  <div class="game-bar">
+    <h2 id="gameTitle">🎴 Lật Thẻ Bài</h2>
+  </div>
+
+  <!-- Thanh chọn chủ đề riêng cho Lật thẻ bài -->
+  <div class="theme-selector" id="themeSelector">
+    <button class="theme-btn active" onclick="changeMemoryTheme(0)">🐶 Động vật</button>
+    <button class="theme-btn" onclick="changeMemoryTheme(1)">🍎 Thức ăn</button>
+    <button class="theme-btn" onclick="changeMemoryTheme(2)">🚗 Phương tiện</button>
+    <button class="theme-btn" onclick="changeMemoryTheme(3)">⚽ Thể thao</button>
+  </div>
+
+  <!-- Dashboard trạng thái & Thông báo preview -->
+  <div class="status-dashboard" id="dashboard"></div>
+  <div id="previewMessage" class="preview-msg"></div>
+
+  <!-- Khung chứa các game -->
+  <div class="game-container">
+    <!-- Game 1: Lật thẻ bài -->
+    <div class="memory-wrapper" id="memoryWrapper">
+      <div class="start-overlay" id="memoryOverlay">
+        <h3>🎴 LẬT THẺ BÀI</h3>
+        <button class="start-btn" onclick="startMemoryGameFromOverlay()">BẮT ĐẦU CHƠI 🚀</button>
+      </div>
+      <div class="memory-board" id="memoryBoard"></div>
+    </div>
+  </div>
+
+  <script src="tuongtac.js"></script>
+</body>
+</html>
